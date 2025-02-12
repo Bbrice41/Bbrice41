@@ -2,38 +2,112 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scène 3D</title>
-    <!-- Ajouter la bibliothèque Three.js -->
+    <title>Scène 3D - Choix du transport</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- Ajout de GSAP pour animations -->
 </head>
 <body>
-    <script>
-        // Création de la scène
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
 
-        // Création d'un cube
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+<script>
+    // Vérification de Three.js
+    if (typeof THREE === 'undefined') {
+        console.error("Erreur : THREE.js n'est pas chargé !");
+    } else {
+        console.log("Three.js est bien chargé !");
+    }
 
-        camera.position.z = 5;
+    // Initialisation de la scène
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-        // Animation
-        function animate() {
-            requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            renderer.render(scene, camera);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Ajout d'une lumière
+    const light = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(light);
+
+    // Création des blocs rectangulaires
+    const geometry = new THREE.BoxGeometry(2, 3, 0.5); // Largeur, hauteur, profondeur
+
+    const materialMaritime = new THREE.MeshBasicMaterial({ color: 0x1E90FF }); // Bleu maritime
+    const materialAerien = new THREE.MeshBasicMaterial({ color: 0xFFD700 });   // Jaune aérien
+    const materialTerrestre = new THREE.MeshBasicMaterial({ color: 0x32CD32 }); // Vert terrestre
+
+    // Création des blocs
+    const blocMaritime = new THREE.Mesh(geometry, materialMaritime);
+    const blocAerien = new THREE.Mesh(geometry, materialAerien);
+    const blocTerrestre = new THREE.Mesh(geometry, materialTerrestre);
+
+    // Position initiale des blocs
+    blocMaritime.position.set(-3, 0, -2);
+    blocAerien.position.set(3, 0, -2);
+    blocTerrestre.position.set(0, 0, 0);
+
+    // Inclinaison initiale des blocs latéraux
+    blocMaritime.rotation.y = 0.2;
+    blocAerien.rotation.y = -0.2;
+
+    // Ajout des blocs à la scène
+    scene.add(blocMaritime, blocAerien, blocTerrestre);
+
+    // Position initiale de la caméra
+    camera.position.set(0, 0, 5);
+
+    // Animation de la scène
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Fonction d'animation pour déplacer un bloc au centre
+    function moveToCenter(selectedBloc, otherBloc1, otherBloc2) {
+        // Déplacer le bloc sélectionné au centre
+        gsap.to(selectedBloc.position, { x: 0, z: 0, duration: 1, ease: "power2.out" });
+        gsap.to(selectedBloc.rotation, { y: 0, duration: 1, ease: "power2.out" });
+
+        // Reculer et tourner légèrement les autres blocs
+        gsap.to(otherBloc1.position, { x: -3, z: -3, duration: 1, ease: "power2.out" });
+        gsap.to(otherBloc1.rotation, { y: 0.4, duration: 1, ease: "power2.out" });
+
+        gsap.to(otherBloc2.position, { x: 3, z: -3, duration: 1, ease: "power2.out" });
+        gsap.to(otherBloc2.rotation, { y: -0.4, duration: 1, ease: "power2.out" });
+    }
+
+    // INTERACTION : Déplacement et rotation des blocs au clic
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    window.addEventListener('click', (event) => {
+        // Convertir la position de la souris en coordonnées Three.js
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Détecter les objets cliqués
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects([blocMaritime, blocAerien, blocTerrestre]);
+
+        if (intersects.length > 0) {
+            const selectedBloc = intersects[0].object;
+
+            // Définir la nouvelle position des blocs
+            if (selectedBloc === blocMaritime) {
+                moveToCenter(blocMaritime, blocAerien, blocTerrestre);
+            } else if (selectedBloc === blocAerien) {
+                moveToCenter(blocAerien, blocMaritime, blocTerrestre);
+            } else if (selectedBloc === blocTerrestre) {
+                moveToCenter(blocTerrestre, blocMaritime, blocAerien);
+            }
         }
+    });
 
-        animate();
-    </script>
+</script>
+
 </body>
 </html>
