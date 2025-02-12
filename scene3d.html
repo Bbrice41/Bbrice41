@@ -12,16 +12,17 @@
         canvas { display: block; }
     </style>
     
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r146/three.min.js"></script>
-
+    <!-- Three.js depuis un CDN fiable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r146/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
 <script>
+    // Vérification du chargement de Three.js
     if (typeof THREE === 'undefined') {
         console.error("⚠ ERREUR : THREE.js ne s'est pas chargé !");
-        alert("Erreur : Impossible de charger THREE.js. Vérifiez que `three.min.js` est bien dans le dossier.");
+        alert("Erreur : Impossible de charger THREE.js. Vérifiez votre connexion internet.");
     } else {
         console.log("✅ THREE.js est bien chargé !");
     }
@@ -36,10 +37,10 @@
     document.body.appendChild(renderer.domElement);
 
     // Lumières améliorées
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Lumière plus forte
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 2);
+    const pointLight = new THREE.PointLight(0xffffff, 1.5);
     pointLight.position.set(0, 5, 5);
     scene.add(pointLight);
 
@@ -51,11 +52,9 @@
         canvas.width = 512;
         canvas.height = 256;
 
-        // Fond semi-transparent avec un effet bleu foncé
-        ctx.fillStyle = "rgba(50, 50, 100, 0.4)";
+        ctx.fillStyle = "rgba(50, 50, 100, 0.5)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Texte lumineux
         ctx.fillStyle = '#ffffff';
         ctx.font = 'Bold 70px Arial';
         ctx.textAlign = 'center';
@@ -68,14 +67,14 @@
         return new THREE.MeshStandardMaterial({ 
             map: texture, 
             transparent: true, 
-            opacity: 0.95, 
-            roughness: 0.1, 
-            metalness: 0.9 
+            opacity: 1, 
+            roughness: 0.2, 
+            metalness: 0.8 
         });
     }
 
-    // Géométrie plus visible
-    const geometry = new THREE.CylinderGeometry(1.8, 1.8, 7, 64); 
+    // Géométrie bien visible
+    const geometry = new THREE.CylinderGeometry(2, 2, 6, 32);
 
     const materialMaritime = createGlassMaterial("Maritime");
     const materialAerien = createGlassMaterial("Aérien");
