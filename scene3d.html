@@ -42,12 +42,33 @@
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    // Création des blocs avec bords arrondis (radius = 20) et ombres
-    const geometry = new THREE.CylinderGeometry(1, 1, 1.5, 20); // Cylindre avec 20 segments arrondis
+    // Fonction pour créer un matériau avec texte
+    function createTextMaterial(text, bgColor) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
-    const materialMaritime = new THREE.MeshStandardMaterial({ color: 0x1E90FF, roughness: 0.3, metalness: 0.7 }); // Bleu maritime
-    const materialAerien = new THREE.MeshStandardMaterial({ color: 0xFFD700, roughness: 0.3, metalness: 0.7 });   // Jaune aérien
-    const materialTerrestre = new THREE.MeshStandardMaterial({ color: 0x32CD32, roughness: 0.3, metalness: 0.7 }); // Vert terrestre
+        canvas.width = 512;
+        canvas.height = 256;
+
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#ffffff';  // Couleur du texte
+        ctx.font = 'Bold 60px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        return new THREE.MeshStandardMaterial({ map: texture });
+    }
+
+    // Création des blocs (2x plus longs qu’avant)
+    const geometry = new THREE.BoxGeometry(4, 2, 1); // Largeur x Hauteur x Profondeur (augmentée)
+
+    const materialMaritime = createTextMaterial("Maritime", "#3366FF"); // Bleu plus moderne
+    const materialAerien = createTextMaterial("Aérien", "#FF5733");   // Orange intense
+    const materialTerrestre = createTextMaterial("Terrestre", "#2ECC71"); // Vert frais
 
     // Création des blocs
     const blocMaritime = new THREE.Mesh(geometry, materialMaritime);
@@ -64,8 +85,8 @@
     blocTerrestre.receiveShadow = true;
 
     // Position initiale des blocs
-    blocMaritime.position.set(-3, 0, -2);
-    blocAerien.position.set(3, 0, -2);
+    blocMaritime.position.set(-5, 0, -3);
+    blocAerien.position.set(5, 0, -3);
     blocTerrestre.position.set(0, 0, 0);
 
     // Inclinaison initiale des blocs latéraux
@@ -76,7 +97,7 @@
     scene.add(blocMaritime, blocAerien, blocTerrestre);
 
     // Position initiale de la caméra
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 0, 6);
 
     // Ajout d'un sol invisible pour les ombres
     const sol = new THREE.PlaneGeometry(20, 20);
@@ -101,10 +122,10 @@
         gsap.to(selectedBloc.rotation, { y: 0, duration: 1, ease: "power2.out" });
 
         // Reculer et tourner légèrement les autres blocs
-        gsap.to(otherBloc1.position, { x: -3, z: -3, duration: 1, ease: "power2.out" });
+        gsap.to(otherBloc1.position, { x: -5, z: -4, duration: 1, ease: "power2.out" });
         gsap.to(otherBloc1.rotation, { y: 0.4, duration: 1, ease: "power2.out" });
 
-        gsap.to(otherBloc2.position, { x: 3, z: -3, duration: 1, ease: "power2.out" });
+        gsap.to(otherBloc2.position, { x: 5, z: -4, duration: 1, ease: "power2.out" });
         gsap.to(otherBloc2.rotation, { y: -0.4, duration: 1, ease: "power2.out" });
     }
 
