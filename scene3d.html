@@ -34,41 +34,50 @@
     document.body.appendChild(renderer.domElement);
 
     // Lumières et Ombres
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Lumière douce
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); // Lumière douce pour ambiance
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = true;
-    scene.add(directionalLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1.5);
+    pointLight.position.set(0, 5, 5);
+    scene.add(pointLight);
 
-    // Fonction pour créer un matériau avec texte
-    function createTextMaterial(text, bgColor) {
+    // Fonction pour créer un matériau effet verre fumé + texte lumineux
+    function createGlassMaterial(text) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
         canvas.width = 512;
         canvas.height = 256;
 
-        ctx.fillStyle = bgColor;
+        // Fond semi-transparent gris foncé
+        ctx.fillStyle = "rgba(30, 30, 50, 0.4)"; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#ffffff';  // Couleur du texte
+        // Texte lumineux blanc avec ombre
+        ctx.fillStyle = '#ffffff';  
         ctx.font = 'Bold 60px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+        ctx.shadowBlur = 20;
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
         const texture = new THREE.CanvasTexture(canvas);
-        return new THREE.MeshStandardMaterial({ map: texture });
+        return new THREE.MeshStandardMaterial({ 
+            map: texture, 
+            transparent: true, 
+            opacity: 0.9, 
+            roughness: 0.1, 
+            metalness: 0.9 
+        });
     }
 
-    // Création des blocs (2x plus longs qu’avant)
-    const geometry = new THREE.BoxGeometry(4, 2, 1); // Largeur x Hauteur x Profondeur (augmentée)
+    // Création des blocs (avec effet Glassmorphism et arrondi)
+    const geometry = new THREE.CapsuleGeometry(1.5, 5, 20, 20); // Arrondi + Allongé
 
-    const materialMaritime = createTextMaterial("Maritime", "#3366FF"); // Bleu plus moderne
-    const materialAerien = createTextMaterial("Aérien", "#FF5733");   // Orange intense
-    const materialTerrestre = createTextMaterial("Terrestre", "#2ECC71"); // Vert frais
+    const materialMaritime = createGlassMaterial("Maritime");
+    const materialAerien = createGlassMaterial("Aérien");
+    const materialTerrestre = createGlassMaterial("Terrestre");
 
     // Création des blocs
     const blocMaritime = new THREE.Mesh(geometry, materialMaritime);
@@ -97,14 +106,14 @@
     scene.add(blocMaritime, blocAerien, blocTerrestre);
 
     // Position initiale de la caméra
-    camera.position.set(0, 0, 6);
+    camera.position.set(0, 0, 7);
 
     // Ajout d'un sol invisible pour les ombres
     const sol = new THREE.PlaneGeometry(20, 20);
     const solMat = new THREE.ShadowMaterial({ opacity: 0.3 });
     const solMesh = new THREE.Mesh(sol, solMat);
     solMesh.rotation.x = -Math.PI / 2;
-    solMesh.position.y = -1.5;
+    solMesh.position.y = -3;
     solMesh.receiveShadow = true;
     scene.add(solMesh);
 
