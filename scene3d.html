@@ -39,15 +39,15 @@
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Lumières améliorées
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    // 💡 Lumière améliorée pour plus de visibilité
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 2);
-    pointLight.position.set(0, 5, 5);
+    const pointLight = new THREE.PointLight(0xffffff, 1.5);
+    pointLight.position.set(0, 8, 10);
     scene.add(pointLight);
 
-    // Matériau amélioré avec effet Glassmorphism
+    // 🎨 Matériau Glassmorphism avec texte ultra net
     function createCardMaterial(text) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -55,17 +55,17 @@
         canvas.width = 1024; // Augmenter la résolution
         canvas.height = 512;
 
-        // Fond semi-transparent avec effet de profondeur
-        ctx.fillStyle = "rgba(30, 30, 60, 0.85)";
+        // Fond semi-transparent effet verre
+        ctx.fillStyle = "rgba(40, 40, 80, 0.85)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Texte blanc bien visible
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'Bold 80px Arial';
+        ctx.font = 'Bold 100px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowColor = "rgba(255, 255, 255, 1)";
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 15;
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
         const texture = new THREE.CanvasTexture(canvas);
@@ -74,12 +74,12 @@
             transparent: true, 
             opacity: 1, 
             roughness: 0.1, 
-            metalness: 0.9 
+            metalness: 0.7 
         });
     }
 
-    // Création des blocs rectangulaires avec coins arrondis
-    const geometry = new THREE.BoxGeometry(3.8, 7, 0.5); // Taille correcte
+    // 📦 Création des blocs rectangulaires arrondis
+    const geometry = new THREE.BoxGeometry(4, 7.5, 0.6); // Taille améliorée
 
     const materialMaritime = createCardMaterial("Maritime");
     const materialAerien = createCardMaterial("Aérien");
@@ -92,16 +92,16 @@
     blocMaritime.castShadow = blocAerien.castShadow = blocTerrestre.castShadow = true;
     blocMaritime.receiveShadow = blocAerien.receiveShadow = blocTerrestre.receiveShadow = true;
 
-    // Position initiale alignée correctement
+    // 📏 Position des blocs
     blocMaritime.position.set(-5, 0, -3);
     blocAerien.position.set(0, 0, -3);
     blocTerrestre.position.set(5, 0, -3);
 
     scene.add(blocMaritime, blocAerien, blocTerrestre);
 
-    camera.position.set(0, 0, 10);
+    camera.position.set(0, 0, 12);
 
-    // Ajout d'un sol invisible pour les ombres
+    // 🛑 Ombres améliorées
     const sol = new THREE.PlaneGeometry(20, 20);
     const solMat = new THREE.ShadowMaterial({ opacity: 0.3 });
     const solMesh = new THREE.Mesh(sol, solMat);
@@ -110,26 +110,26 @@
     solMesh.receiveShadow = true;
     scene.add(solMesh);
 
-    // Animation de la scène
+    // 🎬 Animation fluide
     function animate() {
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
     }
     animate();
 
-    // Fonction pour déplacer un bloc au centre avec animation fluide
+    // 📌 Fonction pour recentrer le bloc sélectionné
     function moveToCenter(selectedBloc, otherBloc1, otherBloc2) {
-        gsap.to(selectedBloc.position, { x: 0, z: 0, duration: 1, ease: "power2.out" });
+        gsap.to(selectedBloc.position, { x: 0, z: 0, duration: 0.8, ease: "power2.out" });
         gsap.to(selectedBloc.scale, { x: 1.2, y: 1.2, duration: 0.5 });
 
-        gsap.to(otherBloc1.position, { x: -5, z: -3, duration: 1, ease: "power2.out" });
-        gsap.to(otherBloc2.position, { x: 5, z: -3, duration: 1, ease: "power2.out" });
+        gsap.to(otherBloc1.position, { x: -5, z: -3, duration: 0.8, ease: "power2.out" });
+        gsap.to(otherBloc2.position, { x: 5, z: -3, duration: 0.8, ease: "power2.out" });
 
         gsap.to(otherBloc1.scale, { x: 1, y: 1, duration: 0.5 });
         gsap.to(otherBloc2.scale, { x: 1, y: 1, duration: 0.5 });
     }
 
-    // Interaction au clic
+    // 🖱 Interaction au clic
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
