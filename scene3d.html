@@ -1,74 +1,39 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Scène 3D</title>
-  <style>
-    body { margin: 0; }
-    canvas { display: block; }
-  </style>
-  <!-- Charge Three.js dans le <head> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r146/three.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scène 3D</title>
+    <!-- Ajouter la bibliothèque Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-  <script>
-    // Initialisation de la scène, de la caméra et du rendu
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    <script>
+        // Création de la scène
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    // Création des blocs
-    const geometry = new THREE.BoxGeometry();
-    const material1 = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Maritime
-    const material2 = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Aérien
-    const material3 = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Terrestre
+        // Création d'un cube
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
 
-    const blocMaritime = new THREE.Mesh(geometry, material1);
-    const blocAerien = new THREE.Mesh(geometry, material2);
-    const blocTerrestre = new THREE.Mesh(geometry, material3);
+        camera.position.z = 5;
 
-    // Positionnement des blocs
-    blocMaritime.position.set(-3, 0, -5); // À gauche en arrière-plan
-    blocAerien.position.set(0, 0, 0);    // Au centre au premier plan
-    blocTerrestre.position.set(3, 0, -5); // À droite en arrière-plan
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
 
-    // Ajout des blocs à la scène
-    scene.add(blocMaritime);
-    scene.add(blocAerien);
-    scene.add(blocTerrestre);
-
-    // Positionnement de la caméra
-    camera.position.z = 5;
-
-    // Animation et rotation
-    function animate() {
-      requestAnimationFrame(animate);
-
-      // Rotation du bloc central
-      blocAerien.rotation.x += 0.01;
-      blocAerien.rotation.y += 0.01;
-
-      renderer.render(scene, camera);
-    }
-
-    // Gestion des événements pour changer de bloc
-    let currentBloc = blocAerien;
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowLeft') {
-        currentBloc = blocMaritime;
-      } else if (event.key === 'ArrowRight') {
-        currentBloc = blocTerrestre;
-      } else if (event.key === 'ArrowUp') {
-        currentBloc = blocAerien;
-      }
-
-      // Recentrer la caméra sur le bloc sélectionné
-      camera.lookAt(currentBloc.position);
-    });
-
-    animate();
-  </script>
+        animate();
+    </script>
 </body>
 </html>
