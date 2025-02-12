@@ -7,22 +7,20 @@
         body {
             margin: 0;
             overflow: hidden;
-            background: radial-gradient(circle farthest-corner at 10% 100%, #414182, #18184a, #0E0E26);
+            background: radial-gradient(circle farthest-corner at 50% 50%, #414182, #18184a, #0E0E26);
         }
         canvas { display: block; }
     </style>
     
-    <!-- Importation de Three.js depuis une source fiable -->
-    <script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+    <script src="three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
 <script>
-    // Attendre que Three.js soit bien chargé avant d'exécuter le code
     if (typeof THREE === 'undefined') {
-        console.error("⚠ ERREUR : THREE.js ne s'est pas chargé correctement !");
-        alert("Erreur : Impossible de charger THREE.js. Vérifiez votre connexion internet ou réessayez.");
+        console.error("⚠ ERREUR : THREE.js ne s'est pas chargé !");
+        alert("Erreur : Impossible de charger THREE.js. Vérifiez que `three.min.js` est bien dans le dossier.");
     } else {
         console.log("✅ THREE.js est bien chargé !");
     }
@@ -36,15 +34,15 @@
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Lumières et ombres
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    // Lumières améliorées
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Lumière plus forte
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 1.5);
+    const pointLight = new THREE.PointLight(0xffffff, 2);
     pointLight.position.set(0, 5, 5);
     scene.add(pointLight);
 
-    // Création d'un matériau effet verre fumé + texte lumineux
+    // Matériau avec effet verre fumé + texte
     function createGlassMaterial(text) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -52,14 +50,16 @@
         canvas.width = 512;
         canvas.height = 256;
 
-        ctx.fillStyle = "rgba(30, 30, 50, 0.4)";
+        // Fond semi-transparent avec un effet bleu foncé
+        ctx.fillStyle = "rgba(50, 50, 100, 0.4)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        // Texte lumineux
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'Bold 60px Arial';
+        ctx.font = 'Bold 70px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = "rgba(255, 255, 255, 0.8)";
+        ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
         ctx.shadowBlur = 20;
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
@@ -67,14 +67,14 @@
         return new THREE.MeshStandardMaterial({ 
             map: texture, 
             transparent: true, 
-            opacity: 0.9, 
-            roughness: 0.2, 
-            metalness: 0.6 
+            opacity: 0.95, 
+            roughness: 0.1, 
+            metalness: 0.9 
         });
     }
 
-    // Correction : Remplacement de CapsuleGeometry par CylinderGeometry
-    const geometry = new THREE.CylinderGeometry(1.5, 1.5, 6, 32); 
+    // Géométrie plus visible
+    const geometry = new THREE.CylinderGeometry(1.8, 1.8, 7, 64); 
 
     const materialMaritime = createGlassMaterial("Maritime");
     const materialAerien = createGlassMaterial("Aérien");
@@ -98,14 +98,14 @@
 
     scene.add(blocMaritime, blocAerien, blocTerrestre);
 
-    camera.position.set(0, 0, 7);
+    camera.position.set(0, 0, 8);
 
     // Ajout d'un sol invisible pour les ombres
     const sol = new THREE.PlaneGeometry(20, 20);
     const solMat = new THREE.ShadowMaterial({ opacity: 0.3 });
     const solMesh = new THREE.Mesh(sol, solMat);
     solMesh.rotation.x = -Math.PI / 2;
-    solMesh.position.y = -3;
+    solMesh.position.y = -4;
     solMesh.receiveShadow = true;
     scene.add(solMesh);
 
@@ -141,14 +141,7 @@
 
         if (intersects.length > 0) {
             const selectedBloc = intersects[0].object;
-
-            if (selectedBloc === blocMaritime) {
-                moveToCenter(blocMaritime, blocAerien, blocTerrestre);
-            } else if (selectedBloc === blocAerien) {
-                moveToCenter(blocAerien, blocMaritime, blocTerrestre);
-            } else if (selectedBloc === blocTerrestre) {
-                moveToCenter(blocTerrestre, blocMaritime, blocAerien);
-            }
+            moveToCenter(selectedBloc, blocMaritime, blocAerien, blocTerrestre);
         }
     });
 
