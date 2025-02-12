@@ -11,7 +11,9 @@
         }
         canvas { display: block; }
     </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r146/three.min.js"></script>
+    
+    <!-- Importation de la bonne version de Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r146/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- GSAP pour animations -->
 </head>
 <body>
@@ -34,7 +36,7 @@
     document.body.appendChild(renderer.domElement);
 
     // Lumières et Ombres
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); // Lumière douce pour ambiance
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // Lumière douce pour ambiance
     scene.add(ambientLight);
 
     const pointLight = new THREE.PointLight(0xffffff, 1.5);
@@ -49,12 +51,12 @@
         canvas.width = 512;
         canvas.height = 256;
 
-        // Fond semi-transparent gris foncé
-        ctx.fillStyle = "rgba(30, 30, 50, 0.4)"; 
+        // Fond semi-transparent
+        ctx.fillStyle = "rgba(30, 30, 50, 0.4)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Texte lumineux blanc avec ombre
-        ctx.fillStyle = '#ffffff';  
+        ctx.fillStyle = '#ffffff';
         ctx.font = 'Bold 60px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -67,13 +69,13 @@
             map: texture, 
             transparent: true, 
             opacity: 0.9, 
-            roughness: 0.1, 
-            metalness: 0.9 
+            roughness: 0.2, 
+            metalness: 0.6 
         });
     }
 
-    // Création des blocs (avec effet Glassmorphism et arrondi)
-    const geometry = new THREE.CapsuleGeometry(1.5, 5, 20, 20); // Arrondi + Allongé
+    // ✅ Remplacement de `CapsuleGeometry` par `CylinderGeometry`
+    const geometry = new THREE.CylinderGeometry(1.5, 1.5, 6, 32); // Cylindre long et arrondi
 
     const materialMaritime = createGlassMaterial("Maritime");
     const materialAerien = createGlassMaterial("Aérien");
