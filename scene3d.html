@@ -12,18 +12,19 @@
         canvas { display: block; }
     </style>
     
-    <!-- Importation de la bonne version de Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r146/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- GSAP pour animations -->
+    <!-- Importation de Three.js depuis une source fiable -->
+    <script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
 <script>
-    // Vérification de Three.js
+    // Attendre que Three.js soit bien chargé avant d'exécuter le code
     if (typeof THREE === 'undefined') {
-        console.error("Erreur : THREE.js n'est pas chargé !");
+        console.error("⚠ ERREUR : THREE.js ne s'est pas chargé correctement !");
+        alert("Erreur : Impossible de charger THREE.js. Vérifiez votre connexion internet ou réessayez.");
     } else {
-        console.log("Three.js est bien chargé !");
+        console.log("✅ THREE.js est bien chargé !");
     }
 
     // Initialisation de la scène
@@ -32,18 +33,18 @@
     const renderer = new THREE.WebGLRenderer({ antialias: true });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;  // Activer les ombres
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // Lumières et Ombres
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // Lumière douce pour ambiance
+    // Lumières et ombres
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight);
 
     const pointLight = new THREE.PointLight(0xffffff, 1.5);
     pointLight.position.set(0, 5, 5);
     scene.add(pointLight);
 
-    // Fonction pour créer un matériau effet verre fumé + texte lumineux
+    // Création d'un matériau effet verre fumé + texte lumineux
     function createGlassMaterial(text) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -51,11 +52,9 @@
         canvas.width = 512;
         canvas.height = 256;
 
-        // Fond semi-transparent
         ctx.fillStyle = "rgba(30, 30, 50, 0.4)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Texte lumineux blanc avec ombre
         ctx.fillStyle = '#ffffff';
         ctx.font = 'Bold 60px Arial';
         ctx.textAlign = 'center';
@@ -74,8 +73,8 @@
         });
     }
 
-    // ✅ Remplacement de `CapsuleGeometry` par `CylinderGeometry`
-    const geometry = new THREE.CylinderGeometry(1.5, 1.5, 6, 32); // Cylindre long et arrondi
+    // Correction : Remplacement de CapsuleGeometry par CylinderGeometry
+    const geometry = new THREE.CylinderGeometry(1.5, 1.5, 6, 32); 
 
     const materialMaritime = createGlassMaterial("Maritime");
     const materialAerien = createGlassMaterial("Aérien");
@@ -86,28 +85,19 @@
     const blocAerien = new THREE.Mesh(geometry, materialAerien);
     const blocTerrestre = new THREE.Mesh(geometry, materialTerrestre);
 
-    // Appliquer les ombres
-    blocMaritime.castShadow = true;
-    blocAerien.castShadow = true;
-    blocTerrestre.castShadow = true;
-
-    blocMaritime.receiveShadow = true;
-    blocAerien.receiveShadow = true;
-    blocTerrestre.receiveShadow = true;
+    blocMaritime.castShadow = blocAerien.castShadow = blocTerrestre.castShadow = true;
+    blocMaritime.receiveShadow = blocAerien.receiveShadow = blocTerrestre.receiveShadow = true;
 
     // Position initiale des blocs
     blocMaritime.position.set(-5, 0, -3);
     blocAerien.position.set(5, 0, -3);
     blocTerrestre.position.set(0, 0, 0);
 
-    // Inclinaison initiale des blocs latéraux
     blocMaritime.rotation.y = 0.2;
     blocAerien.rotation.y = -0.2;
 
-    // Ajout des blocs à la scène
     scene.add(blocMaritime, blocAerien, blocTerrestre);
 
-    // Position initiale de la caméra
     camera.position.set(0, 0, 7);
 
     // Ajout d'un sol invisible pour les ombres
@@ -126,13 +116,11 @@
     }
     animate();
 
-    // Fonction d'animation pour déplacer un bloc au centre
+    // Fonction pour déplacer un bloc au centre
     function moveToCenter(selectedBloc, otherBloc1, otherBloc2) {
-        // Déplacer le bloc sélectionné au centre
         gsap.to(selectedBloc.position, { x: 0, z: 0, duration: 1, ease: "power2.out" });
         gsap.to(selectedBloc.rotation, { y: 0, duration: 1, ease: "power2.out" });
 
-        // Reculer et tourner légèrement les autres blocs
         gsap.to(otherBloc1.position, { x: -5, z: -4, duration: 1, ease: "power2.out" });
         gsap.to(otherBloc1.rotation, { y: 0.4, duration: 1, ease: "power2.out" });
 
@@ -140,23 +128,20 @@
         gsap.to(otherBloc2.rotation, { y: -0.4, duration: 1, ease: "power2.out" });
     }
 
-    // INTERACTION : Déplacement et rotation des blocs au clic
+    // Interaction : Déplacement des blocs au clic
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
     window.addEventListener('click', (event) => {
-        // Convertir la position de la souris en coordonnées Three.js
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        // Détecter les objets cliqués
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects([blocMaritime, blocAerien, blocTerrestre]);
 
         if (intersects.length > 0) {
             const selectedBloc = intersects[0].object;
 
-            // Définir la nouvelle position des blocs
             if (selectedBloc === blocMaritime) {
                 moveToCenter(blocMaritime, blocAerien, blocTerrestre);
             } else if (selectedBloc === blocAerien) {
